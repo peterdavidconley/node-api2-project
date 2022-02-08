@@ -67,20 +67,51 @@ router.post('/', (req, res) => {
 
 // | 4 | PUT    | /api/posts/:id - Updates the post with the specified id using data from the request body and **returns the modified document**, not the original
 
-router.put('/', (req, res) => {
+router.put('/:id', (req, res) => {
 
 })
 
 // | 5 | DELETE | /api/posts/:id          | Removes the post with the specified id and returns the **deleted post object**                                                 
 
-router.delete('/', (req, res) => {
+router.delete('/:id', async (req, res) => {
 
+    try {
+        const post = await Post.findById(req.params.id)
+        if(!post) {
+            res.status(404).json({
+                message: 'The post with the specified ID does not exist'
+            })
+        } else {
+            await Post.remove(req.params.id)
+            res.status(200).json(post)
+        }
+    } catch (err) {
+        res.status(500).json({
+            message: 'The post could not be removed',
+        })
+    }
 })
 
 // | 6 | GET    | /api/posts/:id/comments | Returns an **array of all the comment objects** associated with the post with the specified id    
 
-router.get('/', (req, res) => {
+router.get('/:id/comments', async (req, res) => {
 
+    try {
+        const post = await Posts.findById(req.params.id)
+        if (!post) {
+            res.status(404).json({
+                message: 'The post with the specified ID does not exist'
+            })
+        } else {
+            const message = await Posts.findPostComments(req.params.id)
+            res.status(201).json(message)
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            message: 'The comments information could not be retrieved'
+        })
+    } 
 })
 
 module.exports = router;
