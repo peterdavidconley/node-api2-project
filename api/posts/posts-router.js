@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
     } else {
 
         try {
-        const newPost = await Post.insert(req.body)
+        const newPost = await Posts.insert(req.body)
         res.status(201).json(newPost)
         }
         catch (err) {
@@ -67,16 +67,30 @@ router.put('/:id', (req, res) => {
 
     const { title, content } = req.body
     if (!title || !content) {
-        res.status(404).json({
+        res.status(400).json({
             message: 'Please provide title and contents for the post'
         })
     } else {
         Posts.findById(req.params.id)
         .then(post => {
-
-        }
-
-        )
+            if (!post) {
+                res.status(404).json({
+                    message: 'The post with the specified ID does not exist'
+                })
+            } else {
+                return Posts.update(req.params.id, req.body)
+            }
+        })
+        .then(post => {
+            if (post) {
+                res.json(post)
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: 'The post information could not be modified'
+            })
+        })
     }
 
 })
