@@ -20,8 +20,21 @@ router.get('/', (req, res) => {
 
 // | 2 | GET    | /api/posts/:id - Returns **the post object with the specified id**                 
 
-router.get('/', (req, res) => {
-
+router.get('/:id', (req, res) => {
+    const { id } = req.params
+    Posts.findById(id)
+    .then(post => {
+        if (post){
+            res.status(200).json(post)
+        } else {
+            res.status(404).json({ message: 'The post with the specified ID does not exist'})
+        }
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'The post information could not be retrieved'
+        })
+    })
 })
                                                            
 // | 3 | POST   | /api/posts - Creates a post using the information sent inside the request body and returns **the newly created post object**  
