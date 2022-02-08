@@ -39,7 +39,7 @@ router.get('/:id', (req, res) => {
                                                            
 // | 3 | POST   | /api/posts - Creates a post using the information sent inside the request body and returns **the newly created post object**  
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
 
     const { title, contents } = req.body
     if (!title || !contents) {
@@ -47,20 +47,16 @@ router.post('/', (req, res) => {
             message: 'Please provide title and contents for the post'
         })
     } else {
-        Post.insert({ title, contents })
-        .then(({id}) => {
-            return Post.findById(id)
-        })
-        .then(post => {
-            res.status(201).json(post)
-        })
-        .catch(err => {
+
+        try {
+        const newPost = await Post.insert(req.body)
+        res.status(201).json(newPost)
+        }
+        catch (err) {
             res.status(500).json({
                 message: 'There was an error while saving the post to the database',
-                err: err.message,
-                stack: err.stack
             })
-        })
+        }
     }
 
 })
@@ -69,6 +65,20 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
 
+    const { title, content } = req.body
+    if (!title || !content) {
+        res.status(404).json({
+            message: 'Please provide title and contents for the post'
+        })
+    } else {
+        Posts.findById(req.params.id)
+        .then(post => {
+
+        }
+
+        )
+    }
+
 })
 
 // | 5 | DELETE | /api/posts/:id          | Removes the post with the specified id and returns the **deleted post object**                                                 
@@ -76,18 +86,22 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', async (req, res) => {
 
     try {
-        const post = await Post.findById(req.params.id)
+        const { id } = req.params
+        console.log(id)
+        const post = await Posts.findById(req.params.id)
+        console.log(post)
         if(!post) {
             res.status(404).json({
                 message: 'The post with the specified ID does not exist'
             })
         } else {
-            await Post.remove(req.params.id)
+            await Posts.remove(req.params.id)
             res.status(200).json(post)
         }
     } catch (err) {
         res.status(500).json({
             message: 'The post could not be removed',
+            stack: err.stack,
         })
     }
 })
