@@ -7,7 +7,15 @@ const Posts = require('./posts-model');
 // | 1 | GET    | /api/posts - Returns **an array of all the post objects** contained in the database        
 
 router.get('/', (req, res) => {
-
+    Posts.find()
+    .then(posts => {
+        res.status(200).json(posts)
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'The posts information could not be retrieved'
+        })    
+    })
 })
 
 // | 2 | GET    | /api/posts/:id - Returns **the post object with the specified id**                 
