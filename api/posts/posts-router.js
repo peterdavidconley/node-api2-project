@@ -41,6 +41,28 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
 
+    const { title, contents } = req.body
+    if (!title || !contents) {
+        res.status(400).json({
+            message: 'Please provide title and contents for the post'
+        })
+    } else {
+        Post.insert({ title, contents })
+        .then(({id}) => {
+            return Post.findById(id)
+        })
+        .then(post => {
+            res.status(201).json(post)
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: 'There was an error while saving the post to the database',
+                err: err.message,
+                stack: err.stack
+            })
+        })
+    }
+
 })
 
 // | 4 | PUT    | /api/posts/:id - Updates the post with the specified id using data from the request body and **returns the modified document**, not the original
