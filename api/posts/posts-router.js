@@ -39,7 +39,7 @@ router.get('/:id', (req, res) => {
                                                            
 // | 3 | POST   | /api/posts - Creates a post using the information sent inside the request body and returns **the newly created post object**  
 
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
 
     const { title, contents } = req.body
     if (!title || !contents) {
@@ -48,15 +48,18 @@ router.post('/', async (req, res) => {
         })
     } else {
 
-        try {
-        const newPost = await Posts.insert(req.body)
-        res.status(201).json(newPost)
-        }
-        catch (err) {
+        Posts.insert(req.body)
+        .then( ({ id }) => {
+        return Posts.findById(id) 
+        })
+        .then(post => {
+            res.status(201).json(post)
+        })
+        .catch( err => {
             res.status(500).json({
                 message: 'There was an error while saving the post to the database',
-            })
-        }
+        })
+    })
     }
 
 })
