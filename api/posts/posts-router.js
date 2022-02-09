@@ -68,8 +68,8 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
 
-    const { title, content } = req.body
-    if (!title || !content) {
+    const { title, contents } = req.body
+    if (!title || !contents) {
         res.status(400).json({
             message: 'Please provide title and contents for the post'
         })
@@ -84,9 +84,14 @@ router.put('/:id', (req, res) => {
                 return Posts.update(req.params.id, req.body)
             }
         })
-        .then(post => {
-            if (post) {
-                res.json(post)
+        .then( data => {
+            if (data) {
+                return Posts.findById(req.params.id)
+            }
+        })
+        .then(data => {
+            if (data) {
+                res.json(data)
             }
         })
         .catch(err => {
